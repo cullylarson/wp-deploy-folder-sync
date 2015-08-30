@@ -3,6 +3,7 @@
 namespace Wordpress\Deploy;
 
 use Wordpress\Deploy\FolderSync\Status;
+use Wordpress\Deploy\FolderSync\Options;
 
 class FolderSync {
     /**
@@ -13,6 +14,11 @@ class FolderSync {
      * @var string
      */
     private $dest;
+    /**
+     * @var Options
+     */
+    private $options;
+
     /**
      * The source and destination strings are values that could be passed to
      * rsync/scp (e.g. username@host:path/to/a/folder, or simply path/to/a/folder).
@@ -38,13 +44,8 @@ class FolderSync {
 
         $this->source = $source;
         $this->dest = $dest;
-        $this->options = $options;
+        $this->options = new Options($options);
     }
-
-    /**
-     * @var array
-     */
-    private $options;
 
     /**
      * @param \Closure|null $statusCallback
@@ -110,7 +111,7 @@ class FolderSync {
         $excludeOpts = $this->buildExclude();
         $userOpts = "";
 
-        if($this->shouldDelete()) $userOpts .= " --delete --force";
+        if($this->options->shouldDelete()) $userOpts .= " --delete --force";
 
         return "{$baseCommand} {$baseOpts} {$userOpts} {$excludeOpts} {$this->source} {$this->dest}";
     }
@@ -118,28 +119,10 @@ class FolderSync {
     private function buildExclude() {
         $exclude = "";
 
-        foreach($this->getExclude() as $excludeItem) {
+        foreach($this->options->getExclude() as $excludeItem) {
             $exclude .= sprintf(" --exclude '%s'", escapeshellcmd($excludeItem));
         }
 
         return $exclude;
-    }
-
-    private function shouldDelete() {
-        return $this->getBoolOption("delete", true);
-    }
-
-    private function getBoolOption($option, $defaultVal) {
-        if(!isset($this->options[$option])) return $defaultVal;
-        else return ($this->options[$option] == true);
-    }
-
-    private function getExclude() {
-        return $this->getArrayOption("exclude");
-    }
-
-    private function getArrayOption($option) {
-        if( isset($this->options[$option]) && is_array($this->options[$option])) return $this->options[$option];
-        else return [];
     }
 }
