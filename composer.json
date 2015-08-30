@@ -1,0 +1,20 @@
+{
+  "name": "cullylarson/wp-deploy-folder-sync",
+  "type": "library",
+  "description": "Library for syncing Wordpress folders, like the uploads folder. Useful for deploying, or pulling changes.",
+  "keywords": ["wordpress", "deploy"],
+  "homepage": "https://github.com/cullylarson/wp-deploy-folder-sync",
+  "license": "MIT",
+  "authors": [{
+    "name": "Cully Larson",
+    "email": "cully.larson@gmail.com"
+  }],
+  "require": {
+    "php": ">=5.3.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Wordpress\\": "src/Wordpress"
+    }
+  }
+}
