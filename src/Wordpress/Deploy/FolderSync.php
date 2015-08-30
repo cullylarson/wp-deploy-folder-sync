@@ -39,8 +39,8 @@ class FolderSync {
      */
     public function __construct($source, $dest, array $options=[]) {
         // make sure source and dest end in a slash
-        if( !preg_match(";/^;", $source) ) throw new \InvalidArgumentException("'source' must end with a backslash.");
-        if( !preg_match(";/^;", $dest) ) throw new \InvalidArgumentException("'dest' must end with a backslash.");
+        if( !preg_match(";/$;", $source) ) throw new \InvalidArgumentException("'source' must end with a backslash.");
+        if( !preg_match(";/$;", $dest) ) throw new \InvalidArgumentException("'dest' must end with a backslash.");
 
         $this->source = $source;
         $this->dest = $dest;
@@ -52,7 +52,7 @@ class FolderSync {
      * @return bool
      * @throws \RuntimeException
      */
-    public function sync(\Closure $statusCallback=null) {
+    public function sync($statusCallback=null) {
         $this->ensureRsyncCommand();
 
         /*
@@ -95,12 +95,16 @@ class FolderSync {
         exec("which rsync", $output, $ret);
 
         // doesn't exist
-        if(!$ret) {
+        if($ret) {
             throw new \RuntimeException("Could not find the 'rsync' command on your system.");
         }
     }
 
-    private function doStatusCallback(Status $status, \Closure $statusCallback) {
+    /**
+     * @param Status $status
+     * @param \Closure|null $statusCallback
+     */
+    private function doStatusCallback(Status $status, $statusCallback) {
         if(!$statusCallback) return;
         else $statusCallback($status);
     }

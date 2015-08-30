@@ -5,10 +5,10 @@ namespace Test\Wordpress\Deploy\FolderSync;
 use Wordpress\Deploy\FolderSync;
 
 class SyncTest extends \PHPUnit_Framework_TestCase {
-    private $sourceFiles;
-    private $destFiles;
-    private $sharedFiles;
-    private $folders;
+    private $sourceFiles = [];
+    private $destFiles = [];
+    private $sharedFiles = [];
+    private $folders = [];
 
     public function setUp() {
         $sourceFiles = $this->sourceFiles = [
@@ -55,35 +55,30 @@ class SyncTest extends \PHPUnit_Framework_TestCase {
             $path = $folders['dest'] . "/" . $filename;
             touch($path);
         }
+    }
 
+    public function tearDown() {
         /*
-         * Teardown stuff
+         * Remove the files
          */
 
-        register_shutdown_function(function() use($sourceFiles, $destFiles, $sharedFiles, $folders) {
-            return;//stub
-            /*
-             * Remove the files
-             */
+        $allFiles = array_merge($this->sourceFiles, $this->destFiles, $this->sharedFiles);
 
-            $allFiles = array_merge($sourceFiles, $destFiles, $sharedFiles);
+        foreach($allFiles as $filename) {
+            foreach($this->folders as $folderPath) {
+                $filePath = "{$folderPath}/{$filename}";
 
-            foreach($allFiles as $filename) {
-                foreach($folders as $folderPath) {
-                    $filePath = "{$folderPath}/{$filename}";
-
-                    if(file_exists($filePath)) unlink($filePath);
-                }
+                if(file_exists($filePath)) unlink($filePath);
             }
+        }
 
-            /*
-             * Remove the folders
-             */
+        /*
+         * Remove the folders
+         */
 
-            foreach($folders as $folderPath) {
-                rmdir($folderPath);
-            }
-        });
+        foreach($this->folders as $folderPath) {
+            rmdir($folderPath);
+        }
     }
 
     public function testSync() {
@@ -105,7 +100,40 @@ class SyncTest extends \PHPUnit_Framework_TestCase {
         foreach($this->destFiles as $filename) {
             $filePath = "{$dest}/$filename";
 
-            $this->assertFileNotExists($filename);
+            $this->assertFileNotExists($filePath);
         }
+    }
+
+    public function testExclude() {
+        $exclude = [$this->sourceFiles[0]];
+
+        $source = $this->folders['source'];
+        $dest = $this->folders['dest'];
+
+        $folderSync = new FolderSync($source, $dest, ['exclude' => $exclude]);
+        $folderSync->sync();
+
+        // the excluded files should not be at the destination
+        foreach($exclude as $filename) {
+            $filePath = "{$dest}/$filename";
+
+            $this->assertFileNotExists($filePath);
+        }
+    }
+
+    public function testStatusCallback() {
+        $statusWasCalled = false;
+
+        $statusCallback = function() use ($statusWasCalled) {
+            $statusWasCalled = true;
+        };
+
+        $source = $this->folders['source'];
+        $dest = $this->folders['dest'];
+
+        $folderSync = new FolderSync($source, $dest);
+        $folderSync->sync($statusCallback);
+
+        $this->assertTrue($statusWasCalled);
     }
 }

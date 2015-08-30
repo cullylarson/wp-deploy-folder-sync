@@ -11,4 +11,4 @@ tests/log
 
 # test temp folder
 tests/tmp/*
-!test/tmp/.gitkeep
+!tests/tmp/.gitkeep
