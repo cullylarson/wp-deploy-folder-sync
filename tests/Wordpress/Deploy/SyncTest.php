@@ -128,8 +128,11 @@ class SyncTest extends \PHPUnit_Framework_TestCase {
     public function testStatusCallback() {
         $statusWasCalled = false;
 
-        $statusCallback = function($status) use (&$statusWasCalled) {
+        $self = $this;
+
+        $statusCallback = function($status) use (&$statusWasCalled, $self) {
             $statusWasCalled = true;
+            $self->assertInstanceOf('Wordpress\Deploy\FolderSync\Status', $status);
         };
 
         $source = $this->folders['source'];
