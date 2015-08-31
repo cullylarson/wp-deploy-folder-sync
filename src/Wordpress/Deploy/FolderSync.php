@@ -67,6 +67,8 @@ class FolderSync {
 
         exec($command, $output, $ret);
 
+        $success = !boolval($ret);
+
         /*
          * Get output
          */
@@ -79,13 +81,13 @@ class FolderSync {
          * Process errors
          */
 
-        if(!$ret) {
+        if(!$success) {
             $this->doStatusCallback(
                 new Status("Something went wrong. Sync did not complete successfully.", Status::MT_ERROR),
                 $statusCallback);
         }
 
-        return boolval($ret);
+        return $success;
     }
 
     /**
