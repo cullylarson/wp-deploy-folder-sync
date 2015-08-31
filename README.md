@@ -79,10 +79,53 @@ class MyWordpressDeployer {
         $folderSync = new Wordpress\Deploy\FolderSync(
             "path/to/local/uploads/",
             "username@example.com:path/to/remote/uploads/",
-            ['delete' => true, 'exclude' => ['.gitignore']]);
+            ['delete' => true, 'exclude' => ['.gitkeep']]);
             
         $folderSync->sync();
         
         // ...
     }
 }
+```
+
+### Status Callback
+
+The `Wordpress\Deploy\FolderSync::sync` function can optionally accept a callback
+function.  This callback will be called whenever the sync function wants to post
+a status update (e.g. "I'm running", "Here's the output of the rsync command",
+"Something went wrong", etc.).  It allows you to have some control over whether
+and how messages are handled.
+
+The callback must take one parameter, an instance of `Wordpress\Deploy\FolderSync\Status`.
+
+Here's an example:
+
+```
+<?php
+
+class MyWordpressDeployer {
+    public function deploy() {
+        // ...
+        
+        $statusCallback = function(Wordpress\Deploy\FolderSync\Status $status) {
+            echo $status->Timestamp;
+            
+            if( $status->isError() ) echo "ERROR: ";
+            if( $status->isWarning() ) echo "WARNING: ";
+            if( $status->isRawOutput() ) echo "================\n";
+            
+            echo $status->Message;
+            
+            if( $status->isRawOutput() ) echo "================\n";
+        }
+        
+        $folderSync = new Wordpress\Deploy\FolderSync(
+            "path/to/local/uploads/",
+            "username@example.com:path/to/remote/uploads/");
+            
+        $folderSync->sync($statusCallback);
+        
+        // ...
+    }
+}
+```
