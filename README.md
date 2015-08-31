@@ -108,7 +108,7 @@ class MyWordpressDeployer {
         // ...
         
         $statusCallback = function(Wordpress\Deploy\FolderSync\Status $status) {
-            echo $status->Timestamp;
+            echo $status->Timestamp . " -- ";
             
             if( $status->isError() ) echo "ERROR: ";
             if( $status->isWarning() ) echo "WARNING: ";
