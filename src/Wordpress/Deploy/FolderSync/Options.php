@@ -9,7 +9,7 @@ class Options {
     private $options;
 
     public function __construct(array $options) {
-        $this->options = array();
+        $this->options = $options;
     }
 
     public function shouldDelete() {

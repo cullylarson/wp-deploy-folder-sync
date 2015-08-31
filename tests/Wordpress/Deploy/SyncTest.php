@@ -88,7 +88,7 @@ class SyncTest extends \PHPUnit_Framework_TestCase {
         $folderSync = new FolderSync($source, $dest);
         $folderSync->sync();
 
-        // all of the file source and shared files should be in the destination
+        // all of the source and shared files should be in the destination
         $sourceFilesMerged = array_merge($this->sourceFiles, $this->sharedFiles);
         foreach($sourceFilesMerged as $filename) {
             $filePath = "{$dest}/$filename";
@@ -124,7 +124,7 @@ class SyncTest extends \PHPUnit_Framework_TestCase {
     public function testStatusCallback() {
         $statusWasCalled = false;
 
-        $statusCallback = function() use ($statusWasCalled) {
+        $statusCallback = function($status) use (&$statusWasCalled) {
             $statusWasCalled = true;
         };
 
@@ -135,5 +135,21 @@ class SyncTest extends \PHPUnit_Framework_TestCase {
         $folderSync->sync($statusCallback);
 
         $this->assertTrue($statusWasCalled);
+    }
+
+    public function testNoDelete() {
+        $source = $this->folders['source'];
+        $dest = $this->folders['dest'];
+
+        $folderSync = new FolderSync($source, $dest, ['delete' => false]);
+        $folderSync->sync();
+
+        // all of the source, dest, and shared files should be in the destination
+        $sourceFilesMerged = array_merge($this->sourceFiles, $this->sharedFiles, $this->destFiles);
+        foreach($sourceFilesMerged as $filename) {
+            $filePath = "{$dest}/$filename";
+
+            $this->assertFileExists($filePath);
+        }
     }
 }
