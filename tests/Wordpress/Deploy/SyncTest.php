@@ -81,6 +81,9 @@ class SyncTest extends \PHPUnit_Framework_TestCase {
         }
     }
 
+    /**
+     * Just a vanilla sync of two folders.
+     */
     public function testSync() {
         $source = $this->folders['source'];
         $dest = $this->folders['dest'];
@@ -106,6 +109,9 @@ class SyncTest extends \PHPUnit_Framework_TestCase {
         }
     }
 
+    /**
+     * Excludes files from the sync.
+     */
     public function testExclude() {
         $exclude = [$this->sourceFiles[0]];
 
@@ -146,6 +152,9 @@ class SyncTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($statusWasCalled);
     }
 
+    /**
+     * Do a sync, but don't delete any files.
+     */
     public function testNoDelete() {
         $source = $this->folders['source'];
         $dest = $this->folders['dest'];
