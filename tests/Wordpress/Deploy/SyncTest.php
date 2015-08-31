@@ -86,7 +86,9 @@ class SyncTest extends \PHPUnit_Framework_TestCase {
         $dest = $this->folders['dest'];
 
         $folderSync = new FolderSync($source, $dest);
-        $folderSync->sync();
+        $success = $folderSync->sync();
+
+        $this->assertTrue($success);
 
         // all of the source and shared files should be in the destination
         $sourceFilesMerged = array_merge($this->sourceFiles, $this->sharedFiles);
@@ -111,7 +113,9 @@ class SyncTest extends \PHPUnit_Framework_TestCase {
         $dest = $this->folders['dest'];
 
         $folderSync = new FolderSync($source, $dest, ['exclude' => $exclude]);
-        $folderSync->sync();
+        $success = $folderSync->sync();
+
+        $this->assertTrue($success);
 
         // the excluded files should not be at the destination
         foreach($exclude as $filename) {
@@ -132,7 +136,9 @@ class SyncTest extends \PHPUnit_Framework_TestCase {
         $dest = $this->folders['dest'];
 
         $folderSync = new FolderSync($source, $dest);
-        $folderSync->sync($statusCallback);
+        $success = $folderSync->sync($statusCallback);
+
+        $this->assertTrue($success);
 
         $this->assertTrue($statusWasCalled);
     }
@@ -142,7 +148,9 @@ class SyncTest extends \PHPUnit_Framework_TestCase {
         $dest = $this->folders['dest'];
 
         $folderSync = new FolderSync($source, $dest, ['delete' => false]);
-        $folderSync->sync();
+        $success = $folderSync->sync();
+
+        $this->assertTrue($success);
 
         // all of the source, dest, and shared files should be in the destination
         $sourceFilesMerged = array_merge($this->sourceFiles, $this->sharedFiles, $this->destFiles);
